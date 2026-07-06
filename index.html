@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rythu Connect — రైతు కనెక్ట్</title>
+  <meta name="theme-color" content="#1b5e20">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon">🌾</span>
+      <div>
+        <h1 data-i18n="appName">రైతు కనెక్ట్</h1>
+        <p class="tagline" data-i18n="tagline">హైదరాబాద్ రైతు బజార్లు & సేకరణ కేంద్రాలు</p>
+      </div>
+    </div>
+    <button id="langToggle" class="lang-btn" title="Switch language">English</button>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="map"><span>🗺️</span> <span data-i18n="tabMap">మ్యాప్</span></button>
+    <button class="tab" data-tab="register"><span>📝</span> <span data-i18n="tabRegister">నమోదు</span></button>
+    <button class="tab" data-tab="transport"><span>🚚</span> <span data-i18n="tabTransport">రవాణా బృందాలు</span></button>
+    <button class="tab" data-tab="market"><span>🏪</span> <span data-i18n="tabMarket">మార్కెట్ డిమాండ్</span></button>
+  </nav>
+
+  <!-- MAP TAB -->
+  <section id="tab-map" class="tab-panel active">
+    <div class="legend">
+      <span class="legend-item"><span class="pin-sample pin-bazar">🥬</span> <span data-i18n="legendBazar">రైతు బజార్</span></span>
+      <span class="legend-item"><span class="pin-sample pin-cp">📦</span> <span data-i18n="legendCP">సేకరణ కేంద్రం (ప్రతిపాదిత)</span></span>
+      <span class="legend-item"><span class="pin-sample pin-farmer">👨‍🌾</span> <span data-i18n="legendFarmer">నమోదైన రైతు</span></span>
+      <span class="legend-note" data-i18n="approxNote">📍 స్థానాలు సుమారుగా — క్షేత్రస్థాయిలో ధృవీకరించండి</span>
+      <button id="editPinsBtn" class="mini-btn" data-i18n="editPins">✏️ పిన్ సరిచేయి</button>
+      <button id="resetPinsBtn" class="mini-btn hidden" data-i18n="resetPins">↩️ పిన్‌లను రీసెట్ చేయి</button>
+    </div>
+    <p id="editHint" class="edit-hint hidden" data-i18n="editPinsOn">పిన్‌లను లాగి సరైన స్థానానికి జరపండి — ఆటోమేటిక్‌గా సేవ్ అవుతుంది</p>
+    <div id="mainMap" class="map-box"></div>
+  </section>
+
+  <!-- REGISTER TAB -->
+  <section id="tab-register" class="tab-panel">
+    <div class="two-col">
+      <form id="regForm" class="card">
+        <h2 data-i18n="regTitle">రైతు నమోదు + ఈరోజు తెచ్చే సరుకు</h2>
+
+        <label data-i18n="lblName">పేరు *</label>
+        <input type="text" id="fName" required>
+
+        <label data-i18n="lblPhone">ఫోన్ నంబర్ *</label>
+        <input type="tel" id="fPhone" required pattern="[0-9]{10}" maxlength="10" placeholder="9XXXXXXXXX">
+
+        <label data-i18n="lblScale">రైతు రకం</label>
+        <div class="radio-row">
+          <label><input type="radio" name="scale" value="small" checked> <span data-i18n="scaleSmall">చిన్న రైతు (&lt; 5 ఎకరాలు)</span></label>
+          <label><input type="radio" name="scale" value="large"> <span data-i18n="scaleLarge">పెద్ద రైతు</span></label>
+        </div>
+
+        <label data-i18n="lblVillage">గ్రామం పేరు *</label>
+        <input type="text" id="fVillage" required>
+
+        <label data-i18n="lblMapClick">మీ గ్రామ స్థానం — మ్యాప్‌పై నొక్కండి *</label>
+        <div id="regMap" class="map-box small"></div>
+        <p id="locStatus" class="loc-status" data-i18n="locNotSet">⚠️ స్థానం ఇంకా గుర్తించలేదు</p>
+
+        <label data-i18n="lblProduce">ఈరోజు ఏమి తీసుకువస్తున్నారు? (నొక్కి ఎంచుకోండి) *</label>
+        <div id="produceChips" class="chips"></div>
+        <div id="qtyInputs" class="qty-list"></div>
+
+        <button type="submit" class="btn-primary" data-i18n="btnRegister">నమోదు చేయండి</button>
+      </form>
+
+      <div class="card result-card">
+        <h2 data-i18n="resultTitle">మీ సమీప సేకరణ కేంద్రం</h2>
+        <div id="matchResult" class="match-result">
+          <p class="muted" data-i18n="resultHint">మ్యాప్‌పై మీ గ్రామాన్ని గుర్తించగానే సమీప కేంద్రం ఇక్కడ కనిపిస్తుంది.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRANSPORT TAB -->
+  <section id="tab-transport" class="tab-panel">
+    <div class="card">
+      <h2 data-i18n="transportTitle">ఈరోజు రవాణా బృందాలు — కలిసి వెళ్దాం, ఖర్చు పంచుకుందాం</h2>
+      <p class="muted" data-i18n="transportHint">ఒకే సేకరణ కేంద్రానికి వచ్చే రైతులు ఒక వాహనం పంచుకుంటే ఖర్చు చాలా తగ్గుతుంది.</p>
+      <div id="transportGroups"></div>
+    </div>
+  </section>
+
+  <!-- MARKET TAB -->
+  <section id="tab-market" class="tab-panel">
+    <div class="card">
+      <h2 data-i18n="marketTitle">ఈరోజు మార్కెట్‌కు వస్తున్న సరుకు</h2>
+      <p class="muted" data-i18n="marketHint">బజార్ నిర్వాహకులు / కొనుగోలుదారుల కోసం — ఏ కేంద్రం నుండి ఏ సరుకు ఎంత వస్తుందో చూడండి.</p>
+      <button id="exportCsvBtn" class="mini-btn" data-i18n="exportCsv">⬇️ CSV డౌన్‌లోడ్</button>
+      <div id="marketDemand"></div>
+      <h2 data-i18n="bazarDirTitle">రైతు బజార్ల జాబితా</h2>
+      <div id="bazarDirectory" class="bazar-grid"></div>
+    </div>
+  </section>
+
+  <footer class="foot" data-i18n="footNote">నమూనా యాప్ — డేటా మీ బ్రౌజర్‌లో మాత్రమే నిల్వ అవుతుంది</footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
