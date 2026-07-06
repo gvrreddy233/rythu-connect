@@ -1,5 +1,7 @@
 # Rythu Connect — రైతు కనెక్ట్
 
+**🌐 Live app: https://gvrreddy233.github.io/rythu-connect/** (open on any phone; Android Chrome offers "Add to Home Screen" to install)
+
 A bilingual (Telugu/English) web app for small farmers around Hyderabad:
 
 - **🗺️ Map** — 12 Hyderabad rythu bazars + 10 proposed collection points on the major highways into the city (NH-44, NH-65, NH-163, Rajiv Rahadari, Srisailam Hwy, Chevella Rd). Pin-correction mode lets anyone drag a mislocated pin to its true spot.
